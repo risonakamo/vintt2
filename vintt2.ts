@@ -86,7 +86,7 @@ async function timeProgram(program:FoundProgramResult):Promise<void>
         ${program.name}
         Current Session: ${durationConvert(currentMinutes)}
         Total Time: ${durationConvert(totalMinutes)}
-    `));
+    `).trim());
 
     timer.setInterval(async ()=>{
         currentMinutes+=1;
@@ -96,7 +96,7 @@ async function timeProgram(program:FoundProgramResult):Promise<void>
             ${program.name}
             Current Session: ${durationConvert(currentMinutes)}
             Total Time: ${durationConvert(totalMinutes)}
-        `));
+        `).trim());
     },"","60s");
 }
 

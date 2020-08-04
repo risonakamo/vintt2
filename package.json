@@ -6,6 +6,9 @@
     "build":"tsc",
     "watch":"tsc --watch"
   },
+  "bin": {
+    "vintt2": "build/vintt2.js"
+  },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
     "@types/lodash": "^4.14.158",
@@ -20,8 +23,5 @@
     "nanotimer": "^0.3.15",
     "ps-list": "^7.2.0",
     "strip-indent": "^3.0.0"
-  },
-  "bin": {
-    "vintt2": "build/vintt2.js"
   }
 }
