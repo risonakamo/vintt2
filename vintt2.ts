@@ -5,6 +5,9 @@ import NanoTimer from "nanotimer";
 import log from "log-update";
 import stripIndent from "strip-indent";
 
+const _configPath="config/vintt-config.json";
+const _programTimesPath="config/times.json";
+
 async function main()
 {
     var foundProgram:FoundProgramResult=await watchPrograms(getConfiguration());
@@ -14,8 +17,7 @@ async function main()
 // retrieve vintt configuration
 function getConfiguration():VinttConfiguration
 {
-    var config:VinttConfiguration=fs.readJsonSync(
-        "config/vintt-config.json",{throws:false});
+    var config:VinttConfiguration=fs.readJsonSync(_configPath,{throws:false});
 
     if (!config)
     {
@@ -24,6 +26,21 @@ function getConfiguration():VinttConfiguration
     }
 
     return config;
+}
+
+// get the saved program times
+function getProgramTimes():ProgramTimes
+{
+    var programtimes:ProgramTimes|undefined=fs.readJsonSync(
+        _programTimesPath,{throws:false});
+
+    if (!programtimes)
+    {
+        console.log("unable to read program times");
+        return {};
+    }
+
+    return programtimes;
 }
 
 // watches for a program. returns when it found something.
@@ -53,24 +70,26 @@ async function watchPrograms(config:VinttConfiguration):Promise<FoundProgramResu
 
 // begin timing a program. displays on screen various timing information and about
 // the currently running program. writes to file on the program.
-function timeProgram(program:FoundProgramResult):void
+async function timeProgram(program:FoundProgramResult):Promise<void>
 {
     var timer:NanoTimer=new NanoTimer();
     var currentMinutes:number=0;
+    var totalMinutes:number=await writeProgramTimes(program.name,0);
 
     log(stripIndent(`
         ${program.name}
         Current Session: ${durationConvert(currentMinutes)}
-        Total Time: 2.1 hours
+        Total Time: ${durationConvert(totalMinutes)}
     `));
 
-    timer.setInterval(()=>{
+    timer.setInterval(async ()=>{
         currentMinutes+=1;
+        totalMinutes=await writeProgramTimes(program.name,1);
 
         log(stripIndent(`
             ${program.name}
             Current Session: ${durationConvert(currentMinutes)}
-            Total Time: 2.1 hours
+            Total Time: ${durationConvert(totalMinutes)}
         `));
     },"","1s");
 }
@@ -84,7 +103,26 @@ function durationConvert(minutes:number):string
         return `${minutes} minutes`;
     }
 
-    return `${parseFloat((minutes/60).toFixed(2))} hours`;
+    return `${parseFloat((minutes/60).toFixed(1))} hours`;
+}
+
+// given the name of a program and a number of minute, add that number of
+// minutes to the saved program time file, writing to disk in the process.
+// returns the new total number of minutes of that targetted program.
+async function writeProgramTimes(name:string,minutes:number):Promise<number>
+{
+    var programtimes:ProgramTimes=await getProgramTimes();
+
+    if (!programtimes[name])
+    {
+        programtimes[name]=0;
+    }
+
+    programtimes[name]+=minutes;
+
+    fs.writeJson(_programTimesPath,programtimes);
+
+    return programtimes[name];
 }
 
 main();

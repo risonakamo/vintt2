@@ -8,3 +8,8 @@ interface FoundProgramResult
     exe:string
     name:string
 }
+
+interface ProgramTimes
+{
+    [programName:string]:number
+}
