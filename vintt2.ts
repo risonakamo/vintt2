@@ -6,13 +6,14 @@ import log from "log-update";
 import stripIndent from "strip-indent";
 import keypress from "keypress";
 
-const _configPath="config/vintt-config.json";
-const _programTimesPath="config/times.json";
+const _configPath=`${__dirname}/../config/vintt-config.json`;
+const _programTimesPath=`${__dirname}/../config/times.json`;
 
 keypress(process.stdin);
 
 async function main()
 {
+    setQuitKeys();
     var foundProgram:FoundProgramResult=await watchPrograms(getConfiguration());
     timeProgram(foundProgram);
 }
@@ -97,8 +98,6 @@ async function timeProgram(program:FoundProgramResult):Promise<void>
             Total Time: ${durationConvert(totalMinutes)}
         `));
     },"","60s");
-
-    setQuitKeys();
 }
 
 // given a number of minutes, convert into a duration string with the
