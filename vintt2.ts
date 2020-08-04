@@ -4,9 +4,12 @@ import _ from "lodash";
 import NanoTimer from "nanotimer";
 import log from "log-update";
 import stripIndent from "strip-indent";
+import keypress from "keypress";
 
 const _configPath="config/vintt-config.json";
 const _programTimesPath="config/times.json";
+
+keypress(process.stdin);
 
 async function main()
 {
@@ -64,7 +67,7 @@ async function watchPrograms(config:VinttConfiguration):Promise<FoundProgramResu
 
                 clearInterval(interval);
             }
-        },1500);
+        },1000);
     });
 }
 
@@ -75,6 +78,8 @@ async function timeProgram(program:FoundProgramResult):Promise<void>
     var timer:NanoTimer=new NanoTimer();
     var currentMinutes:number=0;
     var totalMinutes:number=await writeProgramTimes(program.name,0);
+
+    log.clear();
 
     log(stripIndent(`
         ${program.name}
@@ -91,7 +96,9 @@ async function timeProgram(program:FoundProgramResult):Promise<void>
             Current Session: ${durationConvert(currentMinutes)}
             Total Time: ${durationConvert(totalMinutes)}
         `));
-    },"","1s");
+    },"","60s");
+
+    setQuitKeys();
 }
 
 // given a number of minutes, convert into a duration string with the
@@ -123,6 +130,21 @@ async function writeProgramTimes(name:string,minutes:number):Promise<number>
     fs.writeJson(_programTimesPath,programtimes);
 
     return programtimes[name];
+}
+
+// set enter button keycontrol to quit program
+function setQuitKeys():void
+{
+    process.stdin.on("keypress",(ch,key)=>{
+        if (key.name=="return" || key.name=="enter" ||
+            key.name=="q" || key.name=="c")
+        {
+            process.exit();
+        }
+    });
+
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
 }
 
 main();
