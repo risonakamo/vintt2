@@ -6,6 +6,7 @@ import log from "log-update";
 import stripIndent from "strip-indent";
 import keypress from "keypress";
 import chalk from "chalk";
+import {program} from "commander";
 
 const _configPath=`${__dirname}/../config/vintt-config.json`;
 const _programTimesPath=`${__dirname}/../config/times.json`;
@@ -14,9 +15,19 @@ keypress(process.stdin);
 
 async function main()
 {
-    setQuitKeys();
-    var foundProgram:FoundProgramResult=await watchPrograms(getConfiguration());
-    timeProgram(foundProgram);
+    var clioptions:CliOptions=cliActions();
+
+    if (!clioptions.addProgram)
+    {
+        setQuitKeys();
+        var foundProgram:FoundProgramResult=await watchPrograms(getConfiguration());
+        timeProgram(foundProgram);
+    }
+
+    else
+    {
+        console.log("adding",clioptions.addProgram);
+    }
 }
 
 // retrieve vintt configuration
@@ -147,6 +158,31 @@ function printProgramStatus(program:string,currentMinutes:number,
         Current Session: ${durationConvert(currentMinutes)}
         Total Time: ${durationConvert(totalMinutes)}
     `).trim());
+}
+
+// perform cli actions, return cli options.
+function cliActions():CliOptions
+{
+    var cliresult:CliOptions={};
+
+    if (process.argv.length==2)
+    {
+        return {};
+    }
+
+    program
+    .command("add <exename> <programname>")
+    .description("add a new exe to watch")
+    .action((exename:string,programname:string)=>{
+        cliresult.addProgram={
+            exe:exename,
+            name:programname
+        };
+    });
+
+    program.parse();
+
+    return cliresult;
 }
 
 main();

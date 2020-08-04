@@ -15,3 +15,11 @@ interface FoundProgramResult
     exe:string
     name:string
 }
+
+interface CliOptions
+{
+    addProgram?:{
+        exe:string
+        name:string
+    }
+}
