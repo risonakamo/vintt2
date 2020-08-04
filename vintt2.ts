@@ -5,6 +5,7 @@ import NanoTimer from "nanotimer";
 import log from "log-update";
 import stripIndent from "strip-indent";
 import keypress from "keypress";
+import chalk from "chalk";
 
 const _configPath=`${__dirname}/../config/vintt-config.json`;
 const _programTimesPath=`${__dirname}/../config/times.json`;
@@ -82,21 +83,12 @@ async function timeProgram(program:FoundProgramResult):Promise<void>
 
     log.clear();
 
-    log(stripIndent(`
-        ${program.name}
-        Current Session: ${durationConvert(currentMinutes)}
-        Total Time: ${durationConvert(totalMinutes)}
-    `).trim());
+    printProgramStatus(program.name,currentMinutes,totalMinutes);
 
     timer.setInterval(async ()=>{
         currentMinutes+=1;
         totalMinutes=await writeProgramTimes(program.name,1);
-
-        log(stripIndent(`
-            ${program.name}
-            Current Session: ${durationConvert(currentMinutes)}
-            Total Time: ${durationConvert(totalMinutes)}
-        `).trim());
+        printProgramStatus(program.name,currentMinutes,totalMinutes);
     },"","60s");
 }
 
@@ -106,10 +98,10 @@ function durationConvert(minutes:number):string
 {
     if (minutes<=60)
     {
-        return `${minutes} minutes`;
+        return `${chalk.yellow(minutes)} minutes`;
     }
 
-    return `${parseFloat((minutes/60).toFixed(1))} hours`;
+    return `${chalk.yellow(parseFloat((minutes/60).toFixed(1)))} hours`;
 }
 
 // given the name of a program and a number of minute, add that number of
@@ -144,6 +136,17 @@ function setQuitKeys():void
 
     process.stdin.setRawMode(true);
     process.stdin.resume();
+}
+
+// print out the running program, current and total time
+function printProgramStatus(program:string,currentMinutes:number,
+    totalMinutes:number):void
+{
+    log(stripIndent(`
+        ${chalk.yellowBright(program)}
+        Current Session: ${durationConvert(currentMinutes)}
+        Total Time: ${durationConvert(totalMinutes)}
+    `).trim());
 }
 
 main();
