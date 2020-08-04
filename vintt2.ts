@@ -47,7 +47,7 @@ async function watchPrograms(config:VinttConfiguration):Promise<FoundProgramResu
 
                 clearInterval(interval);
             }
-        },2000);
+        },1500);
     });
 }
 
@@ -56,17 +56,35 @@ async function watchPrograms(config:VinttConfiguration):Promise<FoundProgramResu
 function timeProgram(program:FoundProgramResult):void
 {
     var timer:NanoTimer=new NanoTimer();
-    var currentTime:number=0;
+    var currentMinutes:number=0;
+
+    log(stripIndent(`
+        ${program.name}
+        Current Session: ${durationConvert(currentMinutes)}
+        Total Time: 2.1 hours
+    `));
 
     timer.setInterval(()=>{
+        currentMinutes+=1;
+
         log(stripIndent(`
             ${program.name}
-            Current Session: ${currentTime} minutes
+            Current Session: ${durationConvert(currentMinutes)}
             Total Time: 2.1 hours
         `));
+    },"","1s");
+}
 
-        currentTime+=60;
-    },"","1.5s");
+// given a number of minutes, convert into a duration string with the
+// word "minutes" or "hours" if it is over 60 minutes
+function durationConvert(minutes:number):string
+{
+    if (minutes<=60)
+    {
+        return `${minutes} minutes`;
+    }
+
+    return `${parseFloat((minutes/60).toFixed(2))} hours`;
 }
 
 main();
