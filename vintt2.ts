@@ -18,17 +18,22 @@ async function main()
 {
     var clioptions:CliOptions=cliActions();
 
-    if (!clioptions.addProgram)
+    if (clioptions.doWatch)
     {
         setQuitKeys();
         var foundProgram:FoundProgramResult=await watchPrograms(getConfiguration());
         timeProgram(foundProgram);
     }
 
-    else
+    else if (clioptions.addProgram)
     {
         console.log("adding",clioptions.addProgram);
         addProgramToConfig(clioptions.addProgram.name,clioptions.addProgram.exe);
+    }
+
+    else if (clioptions.showTimes)
+    {
+        printTimes();
     }
 }
 
@@ -169,7 +174,8 @@ function cliActions():CliOptions
 
     if (process.argv.length==2)
     {
-        return {};
+        cliresult.doWatch=true;
+        return cliresult;
     }
 
     program
@@ -180,6 +186,13 @@ function cliActions():CliOptions
             exe:exename,
             name:programname
         };
+    });
+
+    program
+    .command("show")
+    .description("show the tracked times")
+    .action(()=>{
+        cliresult.showTimes=true;
     });
 
     program.parse();
@@ -193,6 +206,18 @@ async function addProgramToConfig(name:string,exe:string):Promise<void>
     var config:VinttConfiguration=await getConfiguration();
     config[exe]=name;
     writeJsonFile(_configPath,config);
+}
+
+// print out the saved times
+async function printTimes():Promise<void>
+{
+    console.log("--- recorded times ---");
+
+    var times:ProgramTimes=await getProgramTimes();
+    for (var x in times)
+    {
+        console.log(`${x}: ${durationConvert(times[x])}`);
+    }
 }
 
 main();

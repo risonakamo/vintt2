@@ -22,4 +22,8 @@ interface CliOptions
         exe:string
         name:string
     }
+
+    showTimes?:boolean
+
+    doWatch?:boolean
 }
