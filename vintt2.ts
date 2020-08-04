@@ -7,6 +7,7 @@ import stripIndent from "strip-indent";
 import keypress from "keypress";
 import chalk from "chalk";
 import {program} from "commander";
+import writeJsonFile from "write-json-file";
 
 const _configPath=`${__dirname}/../config/vintt-config.json`;
 const _programTimesPath=`${__dirname}/../config/times.json`;
@@ -27,6 +28,7 @@ async function main()
     else
     {
         console.log("adding",clioptions.addProgram);
+        addProgramToConfig(clioptions.addProgram.name,clioptions.addProgram.exe);
     }
 }
 
@@ -129,7 +131,7 @@ async function writeProgramTimes(name:string,minutes:number):Promise<number>
 
     programtimes[name]+=minutes;
 
-    fs.writeJson(_programTimesPath,programtimes);
+    writeJsonFile(_programTimesPath,programtimes);
 
     return programtimes[name];
 }
@@ -183,6 +185,14 @@ function cliActions():CliOptions
     program.parse();
 
     return cliresult;
+}
+
+// add a new program to the config file
+async function addProgramToConfig(name:string,exe:string):Promise<void>
+{
+    var config:VinttConfiguration=await getConfiguration();
+    config[exe]=name;
+    writeJsonFile(_configPath,config);
 }
 
 main();
