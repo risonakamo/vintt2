@@ -1,0 +1,1 @@
+type ProcessDescriptor=import("ps-list").ProcessDescriptor;

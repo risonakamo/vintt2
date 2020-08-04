@@ -1,8 +1,17 @@
 {
   "name": "vintt2",
-  "version": "2.0.0",
-  "scripts": {},
+  "version": "2.0.0-dev",
+  "scripts": {
+    "buildrun": "tsc && node build/vintt2"
+  },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.1",
+    "@types/lodash": "^4.14.158",
     "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "fs-extra": "^9.0.1",
+    "lodash": "^4.17.19",
+    "ps-list": "^7.2.0"
   }
 }
