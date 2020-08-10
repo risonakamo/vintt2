@@ -45,7 +45,7 @@ function getConfiguration():VinttConfiguration
 
     if (!config)
     {
-        console.log("failed to load configuration");
+        log("failed to load configuration");
         return {};
     }
 
@@ -60,7 +60,7 @@ function getProgramTimes():ProgramTimes
 
     if (!programtimes)
     {
-        console.log("unable to read program times");
+        log("unable to read program times");
         return {};
     }
 
